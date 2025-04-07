@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private IMyAidlInterface iMyAidlInterface;
     private ServiceCallBack serviceCallBack;
     private MyServiceConnection myServiceConnection;
-    private Handler handler = new Handler();
+//    private Handler handler = new Handler();
     private String[] HXAnwar = new String[]{
             "在呢，你的聊天小伙伴已到位",
             "嘿嘿，我是大白,冬瓜、西瓜、哈密瓜，你是大白的小傻瓜 ",
@@ -38,7 +39,12 @@ public class MainActivity extends AppCompatActivity {
             "今天天气怎么样？",
             "能推荐附近的美食吗？",
             "谢谢你的帮助",
-            "再见！"
+            "再见！",
+            "111！",
+            "222！",
+            "333！",
+            "444！",
+            "555！"
     };
 
     String[] robotArr = {
@@ -46,30 +52,96 @@ public class MainActivity extends AppCompatActivity {
             "今天晴转多云，气温25-30℃",
             "附近评分较高的餐厅有：1. XX火锅 2. XX日料",
             "不客气，随时为您服务",
+            "再见！祝您有美好的一天",
+            "aa",
+            "bbbb",
+            "cccc",
+            "ddddddd",
             "再见！祝您有美好的一天"
     };
+    private ChatAdapter adapter;
+    private int currentStep = 0;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    RecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_chat);
         bindService();
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ChatAdapter(new ArrayList<>());
+        recyclerView.setAdapter(adapter);
+        startConversation();
 
-        List<ChatMessage> messages = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            messages.add(new ChatMessage(personArr[i], false));
-            messages.add(new ChatMessage(robotArr[i], true));
-        }
-
-        recyclerView.setAdapter(new ChatAdapter(messages));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService();
+    }
+    private void startConversation() {
+        handler.postDelayed(() -> {
+            if (currentStep < personArr.length) {
+                simulateUserInput(currentStep);
+            }
+        }, 1000);
+    }
+    private void simulateUserInput(int step) {
+        // 添加用户消息
+        ChatMessage userMessage = new ChatMessage(false);
+        adapter.messages.add(userMessage);
+        int position = adapter.messages.size() - 1;
+        adapter.notifyItemInserted(position);
+
+        // 逐个字符显示
+        new Thread(() -> {
+            String text = personArr[step];
+            for (int i = 0; i < text.length(); i++) {
+                final int finalI = i;
+                handler.post(() -> {
+                    adapter.updateMessage(position, String.valueOf(text.charAt(finalI)));
+                    ((LinearLayoutManager) recyclerView.getLayoutManager())
+                            .scrollToPosition(position);
+                });
+                try { Thread.sleep(150); } catch (InterruptedException e) {}
+            }
+            handler.post(() -> {
+                userMessage.setCompleted(true);
+                simulateBotResponse(step);
+            });
+        }).start();
+    }
+
+    private void simulateBotResponse(int step) {
+        // 添加机器人消息
+        ChatMessage botMessage = new ChatMessage(true);
+        adapter.messages.add(botMessage);
+        int position = adapter.messages.size() - 1;
+        adapter.notifyItemInserted(position);
+
+        // 逐个字符显示
+        new Thread(() -> {
+            String text = robotArr[step];
+            for (int i = 0; i < text.length(); i++) {
+                final int finalI = i;
+                handler.post(() -> {
+                    adapter.updateMessage(position, String.valueOf(text.charAt(finalI)));
+                    ((LinearLayoutManager) recyclerView.getLayoutManager())
+                            .scrollToPosition(position);
+                });
+                try { Thread.sleep(150); } catch (InterruptedException e) {}
+            }
+            handler.post(() -> {
+                botMessage.setCompleted(true);
+                currentStep++;
+                if (currentStep < personArr.length) {
+                    handler.postDelayed(() -> simulateUserInput(currentStep), 1000);
+                }
+            });
+        }).start();
     }
     private void bindService(){
         myServiceConnection = new MyServiceConnection();

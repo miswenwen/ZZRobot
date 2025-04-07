@@ -13,7 +13,7 @@ import java.util.List;
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_USER = 0;
     private static final int TYPE_BOT = 1;
-    private final List<ChatMessage> messages;
+    final List<ChatMessage> messages;
 
     public ChatAdapter(List<ChatMessage> messages) {
         this.messages = messages;
@@ -48,7 +48,16 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemCount() {
         return messages.size();
     }
+    // 保持原有ViewHolder结构，增加更新方法
+    public void updateMessage(int position, String text) {
+        messages.get(position).appendText(text);
+        notifyItemChanged(position);
+    }
 
+    public void completeMessage(int position) {
+        messages.get(position).setCompleted(true);
+        notifyItemChanged(position);
+    }
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
 

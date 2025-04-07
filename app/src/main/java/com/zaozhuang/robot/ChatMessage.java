@@ -1,19 +1,24 @@
 package com.zaozhuang.robot;
 
+// ChatMessage.java
 public class ChatMessage {
-    private final String text;
+    private String text;
     private final boolean isBot;
+    private boolean isCompleted;
 
-    public ChatMessage(String text, boolean isBot) {
-        this.text = text;
+    public ChatMessage(boolean isBot) {
         this.isBot = isBot;
+        this.text = "";
     }
 
-    public String getText() {
-        return text;
+    // 更新方法
+    public void appendText(String newText) {
+        this.text += newText;
     }
 
-    public boolean isBot() {
-        return isBot;
-    }
+    // getters & setters
+    public String getText() { return text; }
+    public boolean isBot() { return isBot; }
+    public boolean isCompleted() { return isCompleted; }
+    public void setCompleted(boolean completed) { isCompleted = completed; }
 }
