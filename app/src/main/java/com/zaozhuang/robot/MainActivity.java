@@ -73,6 +73,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ChatAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
+        //很重要，解决模拟打字的闪烁问题
+        recyclerView.setItemAnimator(null);
         startConversation();
 
     }
