@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'com.message.bean'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 24
@@ -12,7 +12,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
-
+    buildFeatures {
+        aidl true
+    }
     buildTypes {
         release {
             minifyEnabled false
