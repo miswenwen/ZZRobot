@@ -1,0 +1,28 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginVertical="8dp"
+    android:gravity="start">
+
+    <TextView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/bg_user_avatar"
+        android:text="😀"
+        android:textSize="20sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:maxWidth="240dp"
+        android:padding="12dp"
+        android:background="@drawable/bg_user_bubble"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"/>
+
+</LinearLayout>

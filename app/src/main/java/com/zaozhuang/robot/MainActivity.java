@@ -1,6 +1,8 @@
 package com.zaozhuang.robot;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -14,6 +16,8 @@ import android.util.Log;
 import com.helang.lib.IMyAidlCallBackInterface;
 import com.helang.lib.IMyAidlInterface;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,15 +32,38 @@ public class MainActivity extends AppCompatActivity {
             "在呢，只要是你，我随时都在哦",
             "在呢，我就是大白，大是大白的大，白是大白的白"
     };
+    // 初始化对话数据
+    String[] personArr = {
+            "你好！",
+            "今天天气怎么样？",
+            "能推荐附近的美食吗？",
+            "谢谢你的帮助",
+            "再见！"
+    };
+
+    String[] robotArr = {
+            "您好！很高兴为您服务",
+            "今天晴转多云，气温25-30℃",
+            "附近评分较高的餐厅有：1. XX火锅 2. XX日料",
+            "不客气，随时为您服务",
+            "再见！祝您有美好的一天"
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        /**
-         * 只需要初始化一次
-         *
-         */
+        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_chat);
         bindService();
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        List<ChatMessage> messages = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            messages.add(new ChatMessage(personArr[i], false));
+            messages.add(new ChatMessage(robotArr[i], true));
+        }
+
+        recyclerView.setAdapter(new ChatAdapter(messages));
     }
 
     @Override
@@ -52,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                 "com.aobo.aibot.aidl.MyService"));
         startService(intent);
         bindService(intent,myServiceConnection,BIND_AUTO_CREATE);
-
     }
     private void unbindService(){
         if (myServiceConnection != null){
