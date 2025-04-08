@@ -44,6 +44,19 @@ public class HttpTest extends AppCompatActivity {
                 // 其他错误处理
             }
         });
+        // 发起POST请求
+//        User user = new User("name", "email");
+//        client.post("user/create", user, CreateResponse.class, new HttpCallback<CreateResponse>() {
+//            @Override
+//            public void onSuccess(CreateResponse response) {
+//                // 处理创建成功
+//            }
+//
+//            @Override
+//            public void onFailure(Throwable throwable) {
+//                // 处理错误
+//            }
+//        });
     }
 
     @Override
