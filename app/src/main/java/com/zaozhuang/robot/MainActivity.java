@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         if (myServiceConnection != null) {
             try {
                 iMyAidlInterface.unregisterListener(serviceCallBack);
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             unbindService(myServiceConnection);
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                     if (iMyAidlInterface != null) {
                         try {
                             iMyAidlInterface.registerListener(serviceCallBack);
-                        } catch (RemoteException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
