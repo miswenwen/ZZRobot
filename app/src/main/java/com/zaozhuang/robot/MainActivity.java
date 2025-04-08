@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private IMyAidlInterface iMyAidlInterface;
     private ServiceCallBack serviceCallBack;
     private MyServiceConnection myServiceConnection;
-//    private Handler handler = new Handler();
+    //    private Handler handler = new Handler();
     private String[] HXAnwar = new String[]{
             "在呢，你的聊天小伙伴已到位",
             "嘿嘿，我是大白,冬瓜、西瓜、哈密瓜，你是大白的小傻瓜 ",
@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private int currentStep = 0;
     private final Handler handler = new Handler(Looper.getMainLooper());
     RecyclerView recyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         unbindService();
     }
+
     private void startConversation() {
         handler.postDelayed(() -> {
             if (currentStep < personArr.length) {
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 1000);
     }
+
     private void simulateUserInput(int step) {
         // 添加用户消息
         ChatMessage userMessage = new ChatMessage(false);
@@ -108,7 +111,10 @@ public class MainActivity extends AppCompatActivity {
                     ((LinearLayoutManager) recyclerView.getLayoutManager())
                             .scrollToPosition(position);
                 });
-                try { Thread.sleep(150); } catch (InterruptedException e) {}
+                try {
+                    Thread.sleep(150);
+                } catch (InterruptedException e) {
+                }
             }
             handler.post(() -> {
                 userMessage.setCompleted(true);
@@ -134,7 +140,10 @@ public class MainActivity extends AppCompatActivity {
                     ((LinearLayoutManager) recyclerView.getLayoutManager())
                             .scrollToPosition(position);
                 });
-                try { Thread.sleep(150); } catch (InterruptedException e) {}
+                try {
+                    Thread.sleep(150);
+                } catch (InterruptedException e) {
+                }
             }
             handler.post(() -> {
                 botMessage.setCompleted(true);
@@ -145,17 +154,19 @@ public class MainActivity extends AppCompatActivity {
             });
         }).start();
     }
-    private void bindService(){
+
+    private void bindService() {
         myServiceConnection = new MyServiceConnection();
         serviceCallBack = new ServiceCallBack();
         Intent intent = new Intent();
         intent.setComponent(new ComponentName("com.aobo.robot.ai3",
                 "com.aobo.aibot.aidl.MyService"));
         startService(intent);
-        bindService(intent,myServiceConnection,BIND_AUTO_CREATE);
+        bindService(intent, myServiceConnection, BIND_AUTO_CREATE);
     }
-    private void unbindService(){
-        if (myServiceConnection != null){
+
+    private void unbindService() {
+        if (myServiceConnection != null) {
             try {
                 iMyAidlInterface.unregisterListener(serviceCallBack);
             } catch (RemoteException e) {
@@ -175,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //注册回调
-                    if (iMyAidlInterface != null){
+                    if (iMyAidlInterface != null) {
                         try {
                             iMyAidlInterface.registerListener(serviceCallBack);
                         } catch (RemoteException e) {
@@ -185,11 +196,13 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
 
         }
     }
+
     /**
      * service回调client的类
      * tag
@@ -201,17 +214,17 @@ public class MainActivity extends AppCompatActivity {
      * 为back_ultrasound 为后超声波消息
      * 为ultrasound_distance 为超声波距离
      */
-    class ServiceCallBack extends IMyAidlCallBackInterface.Stub{
+    class ServiceCallBack extends IMyAidlCallBackInterface.Stub {
 
         @Override
         public void callback(final String tag, final String message) throws RemoteException {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (!tag.equals("1")){
+                    if (!tag.equals("1")) {
 //                        text.append("tag = "+ tag+"  message="+message+"\n");
-                        Log.d("TAG", "callback: "+"tag="+tag+"  message="+message);
-                        if(tag.equals("4")){
+                        Log.d("TAG", "callback: " + "tag=" + tag + "  message=" + message);
+                        if (tag.equals("4")) {
 //                            sendMessageToRobot("starttts","唤醒了啊少时诵诗书所");
                             if (message.startsWith("wake up")) {
                                 final Random random = new Random();
@@ -226,8 +239,8 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         }
-                    }else{
-                        Log.d("TAG", "run: "+"tag="+tag+"  message="+message+"\n");
+                    } else {
+                        Log.d("TAG", "run: " + "tag=" + tag + "  message=" + message + "\n");
                         //语音识别的音量反馈
                     }
                 }

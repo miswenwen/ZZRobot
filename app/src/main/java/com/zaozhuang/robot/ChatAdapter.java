@@ -48,6 +48,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemCount() {
         return messages.size();
     }
+
     // 保持原有ViewHolder结构，增加更新方法
     public void updateMessage(int position, String text) {
         messages.get(position).appendText(text);
@@ -58,6 +59,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         messages.get(position).setCompleted(true);
         notifyItemChanged(position);
     }
+
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
 

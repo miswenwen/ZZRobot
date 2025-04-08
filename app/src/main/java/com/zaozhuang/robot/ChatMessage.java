@@ -17,8 +17,19 @@ public class ChatMessage {
     }
 
     // getters & setters
-    public String getText() { return text; }
-    public boolean isBot() { return isBot; }
-    public boolean isCompleted() { return isCompleted; }
-    public void setCompleted(boolean completed) { isCompleted = completed; }
+    public String getText() {
+        return text;
+    }
+
+    public boolean isBot() {
+        return isBot;
+    }
+
+    public boolean isCompleted() {
+        return isCompleted;
+    }
+
+    public void setCompleted(boolean completed) {
+        isCompleted = completed;
+    }
 }
