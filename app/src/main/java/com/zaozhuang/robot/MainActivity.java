@@ -9,12 +9,14 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.helang.lib.IMyAidlCallBackInterface;
 import com.helang.lib.IMyAidlInterface;
 
@@ -72,10 +74,13 @@ public class MainActivity extends AppCompatActivity {
 
     private int mTalkingState = 0;
 
-   private static final int  IDLE = 0;//闲置中，人和机器人都没说话
-    private static final int  MEN_TALKING = 1;//人在说话中
-    private static final int  ROBOT_THINKING = 2;//机器人请求大模型中
-    private static final int  ROBOT_ANSWERING = 3;//机器人回答中
+    private static final int IDLE = 0;//闲置中，人和机器人都没说话
+    private static final int MEN_TALKING = 1;//人在说话中
+    private static final int ROBOT_THINKING = 2;//机器人请求大模型中
+    private static final int ROBOT_ANSWERING = 3;//机器人回答中
+    private TextView mTalkingStateText;
+    private LottieAnimationView mWaveAnim;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +99,10 @@ public class MainActivity extends AppCompatActivity {
         tvDate = findViewById(R.id.tv_date);
         updateTime();
         startRealtimeUpdates();
+
+        mTalkingStateText = (TextView) findViewById(R.id.talking_stata_text);
+        mWaveAnim = (LottieAnimationView) findViewById(R.id.wave_anim);
+        setTalkingState(IDLE);
     }
 
     @Override
@@ -110,20 +119,29 @@ public class MainActivity extends AppCompatActivity {
         tvDate.setText(dateFormat.format(now));
     }
 
-    private void setTalkingState(int state){
+    private void setTalkingState(int state) {
         mTalkingState = state; // 更新当前状态
         switch (state) {
             case IDLE:
+                mTalkingStateText.setText("请说话");
+                mWaveAnim.setVisibility(View.GONE);
                 break;
             case MEN_TALKING:
+                mTalkingStateText.setText("语音接收中...");
+                mWaveAnim.setVisibility(View.VISIBLE);
                 break;
             case ROBOT_THINKING:
+                mTalkingStateText.setText("大模型思考中...");
+                mWaveAnim.setVisibility(View.VISIBLE);
                 break;
             case ROBOT_ANSWERING:
+                mTalkingStateText.setText("机器人回答中...");
+                mWaveAnim.setVisibility(View.VISIBLE);
                 break;
             default:
         }
     }
+
     // 启动定时更新
     private void startRealtimeUpdates() {
         handler.postDelayed(new Runnable() {
@@ -149,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.messages.add(userMessage);
         int position = adapter.messages.size() - 1;
         adapter.notifyItemInserted(position);
-
+        setTalkingState(MEN_TALKING);
         // 逐个字符显示
         new Thread(() -> {
             String text = personArr[step];
@@ -177,31 +195,38 @@ public class MainActivity extends AppCompatActivity {
         ChatMessage botMessage = new ChatMessage(true);
         adapter.messages.add(botMessage);
         int position = adapter.messages.size() - 1;
-        adapter.notifyItemInserted(position);
+        setTalkingState(ROBOT_THINKING);
+        handler.postDelayed(() -> {
+                    adapter.notifyItemInserted(position);
+                    setTalkingState(ROBOT_ANSWERING);
+                    // 逐个字符显示
+                    new Thread(() -> {
+                        String text = robotArr[step];
+                        for (int i = 0; i < text.length(); i++) {
+                            final int finalI = i;
+                            handler.post(() -> {
+                                adapter.updateMessage(position, String.valueOf(text.charAt(finalI)));
+                                ((LinearLayoutManager) recyclerView.getLayoutManager())
+                                        .scrollToPosition(position);
+                            });
+                            try {
+                                Thread.sleep(150);
+                            } catch (InterruptedException e) {
+                            }
+                        }
+                        handler.post(() -> {
+                            botMessage.setCompleted(true);
+                            currentStep++;
+                            if (currentStep < personArr.length) {
+                                handler.postDelayed(() -> simulateUserInput(currentStep), 1000);
+                            } else {
+                                setTalkingState(IDLE);
+                            }
+                        });
+                    }).start();
+                }, 1000
+        );
 
-        // 逐个字符显示
-        new Thread(() -> {
-            String text = robotArr[step];
-            for (int i = 0; i < text.length(); i++) {
-                final int finalI = i;
-                handler.post(() -> {
-                    adapter.updateMessage(position, String.valueOf(text.charAt(finalI)));
-                    ((LinearLayoutManager) recyclerView.getLayoutManager())
-                            .scrollToPosition(position);
-                });
-                try {
-                    Thread.sleep(150);
-                } catch (InterruptedException e) {
-                }
-            }
-            handler.post(() -> {
-                botMessage.setCompleted(true);
-                currentStep++;
-                if (currentStep < personArr.length) {
-                    handler.postDelayed(() -> simulateUserInput(currentStep), 1000);
-                }
-            });
-        }).start();
     }
 
     private void bindService() {
