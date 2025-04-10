@@ -70,6 +70,12 @@ public class MainActivity extends AppCompatActivity {
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
+    private int mTalkingState = 0;
+
+   private static final int  IDLE = 0;//闲置中，人和机器人都没说话
+    private static final int  MEN_TALKING = 1;//人在说话中
+    private static final int  ROBOT_THINKING = 2;//机器人请求大模型中
+    private static final int  ROBOT_ANSWERING = 3;//机器人回答中
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +110,20 @@ public class MainActivity extends AppCompatActivity {
         tvDate.setText(dateFormat.format(now));
     }
 
+    private void setTalkingState(int state){
+        mTalkingState = state; // 更新当前状态
+        switch (state) {
+            case IDLE:
+                break;
+            case MEN_TALKING:
+                break;
+            case ROBOT_THINKING:
+                break;
+            case ROBOT_ANSWERING:
+                break;
+            default:
+        }
+    }
     // 启动定时更新
     private void startRealtimeUpdates() {
         handler.postDelayed(new Runnable() {

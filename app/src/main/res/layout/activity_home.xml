@@ -22,4 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="人脸识别(迎宾用)"/>
+    <TextView
+        android:id="@+id/dm_density"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="分辨率"
+        />
 </LinearLayout>
