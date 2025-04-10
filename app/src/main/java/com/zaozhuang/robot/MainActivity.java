@@ -1,9 +1,5 @@
 package com.zaozhuang.robot;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -13,12 +9,19 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.helang.lib.IMyAidlCallBackInterface;
 import com.helang.lib.IMyAidlInterface;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
     private int currentStep = 0;
     private final Handler handler = new Handler(Looper.getMainLooper());
     RecyclerView recyclerView;
+    private TextView tvTime, tvDate;
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,12 +84,35 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(null);
         startConversation();
 
+        tvTime = findViewById(R.id.tv_time);
+        tvDate = findViewById(R.id.tv_date);
+        updateTime();
+        startRealtimeUpdates();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService();
+        handler.removeCallbacksAndMessages(null); // 防止内存泄漏
+    }
+
+    // 更新时间显示
+    private void updateTime() {
+        Date now = new Date();
+        tvTime.setText(timeFormat.format(now));
+        tvDate.setText(dateFormat.format(now));
+    }
+
+    // 启动定时更新
+    private void startRealtimeUpdates() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                updateTime();
+                handler.postDelayed(this, 1000); // 每1秒更新一次
+            }
+        }, 1000);
     }
 
     private void startConversation() {
