@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.util.Log;
+import android.view.Surface;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -81,8 +82,12 @@ public class FaceDetectionActivity extends AppCompatActivity {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
 
+                //设置为COMPATIBLE和setTargetRotation(previewView.getDisplay().getRotation())，fix 机器人预览图像方向不对的问题
+                previewView.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE);
                 // 配置预览
-                Preview preview = new Preview.Builder().build();
+                Preview preview = new Preview.Builder().
+                        setTargetRotation(previewView.getDisplay().getRotation()).
+                        build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
                 // 配置图像分析
@@ -106,9 +111,14 @@ public class FaceDetectionActivity extends AppCompatActivity {
 
                 // 绑定生命周期
                 cameraProvider.unbindAll();
+                //LENS_FACING_BACK/LENS_FACING_FRONT/LENS_FACING_EXTERNAL
+                //实测机器人的外接摄像头竟然是LENS_FACING_BACK，而不是LENS_FACING_EXTERNAL
+                CameraSelector cameraSelector = new CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                        .build();
                 cameraProvider.bindToLifecycle(
                         this,
-                        CameraSelector.DEFAULT_FRONT_CAMERA,//前后摄
+                        cameraSelector,//前后摄
                         preview,
                         imageAnalysis
                 );
@@ -174,16 +184,17 @@ public class FaceDetectionActivity extends AppCompatActivity {
 
     // 将 ImageProxy（YUV）转换为 Bitmap（RGB）
     private Bitmap imageProxyToBitmap(ImageProxy imageProxy) {
-        //实测toBitmap的图片是横着的，得旋转下
-        int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
-        Bitmap bitmap = imageProxy.toBitmap();
-        Matrix matrix = new Matrix();
-        matrix.postRotate(rotationDegrees);
-        // 创建一个新的Bitmap，其内容是旋转后的图像
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        // 如果不再需要原始bitmap，可以回收它
-        bitmap.recycle();
-        return rotatedBitmap;
+        return imageProxy.toBitmap();
+//        //实测手机上前摄toBitmap的图片是横着的，得旋转下
+//        int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
+//        Bitmap bitmap = imageProxy.toBitmap();
+//        Matrix matrix = new Matrix();
+//        matrix.postRotate(rotationDegrees);
+//        // 创建一个新的Bitmap，其内容是旋转后的图像
+//        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+//        // 如果不再需要原始bitmap，可以回收它
+//        bitmap.recycle();
+//        return rotatedBitmap;
     }
 
     @Override
