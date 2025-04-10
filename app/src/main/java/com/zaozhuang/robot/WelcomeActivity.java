@@ -87,8 +87,6 @@ public class WelcomeActivity extends AppCompatActivity {
     private static final int GRID_SIZE = 3; // 3x3网格
     private RelativeLayout container;
     private int cellWidth, cellHeight;
-    private static final int TEXTVIEW_COUNT = 8;
-    private static final int CONTAINER_HEIGHT_DP = 200;
     private int containerWidth;
     private void initFlowAnim() {
         container = findViewById(R.id.container);
@@ -187,30 +185,6 @@ public class WelcomeActivity extends AppCompatActivity {
         container.addView(tv, params);
         startAnimation();
     }
-    private void initTextViews() {
-        Random random = new Random();
-        int containerHeightPx = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, CONTAINER_HEIGHT_DP,
-                getResources().getDisplayMetrics());
-
-        for (int i = 0; i < TEXTVIEW_COUNT; i++) {
-            TextView tv = new TextView(this);
-            tv.setText("Item " + (i + 1));
-            tv.setTextSize(16);
-            tv.setPadding(32, 16, 32, 16);
-            tv.setBackgroundColor(Color.parseColor("#4CAF50"));
-            tv.setTextColor(Color.WHITE);
-
-            // 随机初始化位置
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT);
-            params.leftMargin = random.nextInt(containerWidth);
-            params.topMargin = random.nextInt(containerHeightPx - dpToPx(48));
-            container.addView(tv, params);
-        }
-    }
-
     private void startAnimation() {
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
         animator.setRepeatCount(ValueAnimator.INFINITE);
