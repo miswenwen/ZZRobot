@@ -16,6 +16,7 @@ public class HomeActivity extends AppCompatActivity {
     Button meetingBtn;
     Button talkBtn;
     Button faceDetectionBtn;
+    Button robotFuc;
     TextView dmDensityText;
 
     @Override
@@ -25,6 +26,7 @@ public class HomeActivity extends AppCompatActivity {
         meetingBtn = (Button) findViewById(R.id.meeting);
         talkBtn = (Button) findViewById(R.id.talk);
         faceDetectionBtn = (Button) findViewById(R.id.face_detection);
+        robotFuc = (Button) findViewById(R.id.robot_func);
         dmDensityText = (TextView) findViewById(R.id.dm_density);
         meetingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,6 +46,13 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(HomeActivity.this, FaceDetectionActivity.class);
+                startActivity(intent);
+            }
+        });
+        robotFuc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, WelcomeActivity.class);
                 startActivity(intent);
             }
         });

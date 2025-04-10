@@ -1,0 +1,20 @@
+<!--机器人分辨率
+1080x1866
+density 0.96~=1
+这里用dp，px区别不大了，干脆直接上px得了-->
+<resources>
+    <dimen name="general_padding">32px</dimen>
+    <dimen name="large_font_size">54px</dimen>
+    <dimen name="middle_font_size">48px</dimen>
+    <dimen name="general_font_size">36px</dimen>
+    <dimen name="small_font_size">36px</dimen>
+    <dimen name="x_small_font_size">20px</dimen>
+    <!--Header相关-->
+    <dimen name="icon_size">56px</dimen>
+    <dimen name="time_font_size">36px</dimen>
+    <dimen name="date_font_size">20px</dimen>
+    <dimen name="header_height">100px</dimen>
+    <!--title相关-->
+    <dimen name="title_height">100px</dimen>
+    <dimen name="icon_margin">15px</dimen>
+</resources>

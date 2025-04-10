@@ -1,5 +1,5 @@
 <RelativeLayout android:layout_width="match_parent"
-    android:layout_height="35dp"
+    android:layout_height="@dimen/title_height"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 中间居中文本 -->
     <TextView
@@ -8,23 +8,23 @@
         android:layout_height="wrap_content"
         android:text="大模型智能对话"
         android:textColor="@color/white"
-        android:textSize="12sp"
+        android:textSize="@dimen/general_font_size"
         android:layout_centerInParent="true"/>
     <!-- 左侧图片 -->
     <ImageView
         android:id="@+id/icon_left"
-        android:layout_width="20dp"
+        android:layout_width="@dimen/icon_size"
         android:layout_height="wrap_content"
         android:src="@drawable/broken_line"
         android:layout_toLeftOf="@id/center_text"
         android:layout_centerVertical="true"
-        android:layout_marginRight="5dp"
+        android:layout_marginRight="@dimen/icon_margin"
         />
 
     <!-- 右侧图片 -->
     <ImageView
         android:id="@+id/icon_right"
-        android:layout_width="20dp"
+        android:layout_width="@dimen/icon_size"
         android:layout_height="wrap_content"
         android:src="@drawable/broken_line"
         android:layout_toRightOf="@id/center_text"

@@ -28,4 +28,9 @@
         android:layout_height="wrap_content"
         android:text="分辨率"
         />
+    <Button
+        android:id="@+id/robot_func"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="演示用(processing)"/>
 </LinearLayout>

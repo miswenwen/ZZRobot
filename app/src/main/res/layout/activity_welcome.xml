@@ -1,0 +1,13 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/general_padding"
+    android:paddingRight="@dimen/general_padding">
+    <!--枣庄人社机器人标题-->
+    <include
+        android:id="@+id/included_header"
+        layout="@layout/chat_header" />
+</LinearLayout>

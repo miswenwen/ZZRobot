@@ -1,0 +1,16 @@
+<resources>
+    <dimen name="general_padding">8dp</dimen>
+    <dimen name="large_font_size">18sp</dimen>
+    <dimen name="middle_font_size">16sp</dimen>
+    <dimen name="general_font_size">12sp</dimen>
+    <dimen name="small_font_size">12sp</dimen>
+    <dimen name="x_small_font_size">9sp</dimen>
+    <!--Header相关-->
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="time_font_size">12sp</dimen>
+    <dimen name="date_font_size">9sp</dimen>
+    <dimen name="header_height">35dp</dimen>
+    <!--title相关-->
+    <dimen name="title_height">35dp</dimen>
+    <dimen name="icon_margin">5dp</dimen>
+</resources>
