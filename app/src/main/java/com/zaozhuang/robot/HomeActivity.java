@@ -17,6 +17,7 @@ public class HomeActivity extends AppCompatActivity {
     Button talkBtn;
     Button faceDetectionBtn;
     TextView dmDensityText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,21 +29,21 @@ public class HomeActivity extends AppCompatActivity {
         meetingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this,HttpTest.class);
+                Intent intent = new Intent(HomeActivity.this, HttpTest.class);
                 startActivity(intent);
             }
         });
         talkBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this,MainActivity.class);
+                Intent intent = new Intent(HomeActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });
         faceDetectionBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this,FaceDetectionActivity.class);
+                Intent intent = new Intent(HomeActivity.this, FaceDetectionActivity.class);
                 startActivity(intent);
             }
         });
@@ -65,14 +66,18 @@ public class HomeActivity extends AppCompatActivity {
 
         // 将 dpi 转换为可读的密度类型（如 hdpi、xhdpi）
         String densityType = getDensityType(densityDpi);
-
+        // 获取系统版本信息
+        int sdkVersion = Build.VERSION.SDK_INT;
+        String versionName = Build.VERSION.RELEASE;
         // 输出结果
         String info = "Device Resolution: " + widthPx + "x" + heightPx + "px\n"
                 + "DPI: " + densityDpi + " (" + densityType + ")\n"
-                + "Density: " + displayMetrics.density;
+                + "Density: " + displayMetrics.density + "\n"
+                + "API Level: " + sdkVersion + "\nVersion: " + versionName;
         dmDensityText.setText(info);
 
     }
+
     // 根据 dpi 返回密度类型
     private static String getDensityType(int densityDpi) {
         if (densityDpi <= DisplayMetrics.DENSITY_LOW) {
@@ -91,6 +96,7 @@ public class HomeActivity extends AppCompatActivity {
             return "unknown";
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
