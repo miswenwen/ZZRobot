@@ -7,7 +7,7 @@
         />
     <corners
         android:topLeftRadius="0dp"
-        android:topRightRadius="8dp"
-        android:bottomRightRadius="8dp"
-        android:bottomLeftRadius="8dp"/>
+        android:topRightRadius="@dimen/general_radius"
+        android:bottomRightRadius="@dimen/general_radius"
+        android:bottomLeftRadius="@dimen/general_radius"/>
 </shape>

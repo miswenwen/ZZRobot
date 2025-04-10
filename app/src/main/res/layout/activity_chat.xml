@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background"
     android:orientation="vertical"
-    android:paddingLeft="@dimen/general_padding"
-    android:paddingRight="@dimen/general_padding">
+    android:paddingLeft="@dimen/general_space"
+    android:paddingRight="@dimen/general_space">
     <!--枣庄人社机器人标题-->
     <include
         android:id="@+id/included_header"
@@ -24,11 +24,11 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/wave_anim"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/wave_anim_width"
+        android:layout_height="@dimen/wave_anim_height"
         android:layout_gravity="center_horizontal"
         android:scaleType="centerCrop"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/wave_anim" />
@@ -39,5 +39,5 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textColor="#1E99FF"
-        android:textSize="16sp" />
+        android:textSize="@dimen/middle_font_size" />
 </LinearLayout>

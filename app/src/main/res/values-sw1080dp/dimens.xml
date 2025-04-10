@@ -3,13 +3,15 @@
 density 0.96~=1
 这里用dp，px区别不大了，干脆直接上px得了-->
 <resources>
-    <dimen name="general_padding">32px</dimen>
+    <dimen name="general_space">32px</dimen>
     <dimen name="large_font_size">54px</dimen>
     <dimen name="middle_font_size">48px</dimen>
     <dimen name="general_font_size">36px</dimen>
     <dimen name="small_font_size">36px</dimen>
     <dimen name="x_small_font_size">20px</dimen>
+    <dimen name="general_radius">24px</dimen>
     <!--Header相关-->
+    <dimen name="large_icon_size">96dp</dimen>
     <dimen name="icon_size">56px</dimen>
     <dimen name="time_font_size">36px</dimen>
     <dimen name="date_font_size">20px</dimen>
@@ -17,4 +19,11 @@ density 0.96~=1
     <!--title相关-->
     <dimen name="title_height">100px</dimen>
     <dimen name="icon_margin">15px</dimen>
+    <!--wave动画-->
+    <dimen name="wave_anim_width">300px</dimen>
+    <dimen name="wave_anim_height">150px</dimen>
+    <!--语音通话相关-->
+    <dimen name="talk_tile_padding">36px</dimen>
+    <dimen name="talk_tile_max_width">750px</dimen>
+    <dimen name="talk_tile_icon_text_size">60px</dimen>
 </resources>

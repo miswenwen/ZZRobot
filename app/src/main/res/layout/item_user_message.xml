@@ -3,27 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginVertical="8dp"
+    android:layout_marginVertical="@dimen/general_space"
     android:gravity="end">
 
     <TextView
         android:visibility="gone"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="@dimen/large_icon_size"
+        android:layout_height="@dimen/large_icon_size"
         android:background="@drawable/bg_user_avatar"
         android:text="😀"
-        android:textSize="20sp"
+        android:textSize="@dimen/talk_tile_icon_text_size"
         android:gravity="center"/>
 
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:maxWidth="240dp"
-        android:padding="12dp"
+        android:layout_marginStart="@dimen/general_space"
+        android:maxWidth="@dimen/talk_tile_max_width"
+        android:padding="@dimen/talk_tile_padding"
         android:background="@drawable/bg_user_bubble"
         android:textColor="#006CC5"
-        android:textSize="16sp"/>
+        android:textSize="@dimen/middle_font_size"/>
 
 </LinearLayout>

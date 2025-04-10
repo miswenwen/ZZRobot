@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         switch (state) {
             case IDLE:
                 mTalkingStateText.setText("请说话");
-                mWaveAnim.setVisibility(View.GONE);
+                mWaveAnim.setVisibility(View.INVISIBLE);
                 break;
             case MEN_TALKING:
                 mTalkingStateText.setText("语音接收中...");
