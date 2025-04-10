@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 定义线性渐变 -->
+    <gradient
+        android:startColor="#FB8F3C"
+        android:endColor="#F7ACA7"
+        android:type="linear" />
+    <!-- 圆角半径 -->
+    <corners android:radius="20px" />
+</shape>

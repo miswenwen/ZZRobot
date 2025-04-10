@@ -3,11 +3,19 @@ package com.zaozhuang.robot;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -19,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.helang.lib.IMyAidlCallBackInterface;
 import com.helang.lib.IMyAidlInterface;
+import com.zaozhuang.robot.view.OffsetBackgroundSpan;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,17 +52,93 @@ public class WelcomeActivity extends AppCompatActivity {
     private static final int ROBOT_THINKING = 2;//机器人请求大模型中
     private static final int ROBOT_ANSWERING = 3;//机器人回答中
 
+    private TextView qaText, guideText, introText, remoteText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
-        setContentView(R.layout.activity_chat);
+        setContentView(R.layout.activity_welcome);
         bindService();
 
         tvTime = findViewById(R.id.tv_time);
         tvDate = findViewById(R.id.tv_date);
+        qaText = findViewById(R.id.qa_tv);
+        guideText = findViewById(R.id.guide_tv);
+        introText = findViewById(R.id.intro_tv);
+        remoteText = findViewById(R.id.remote_tv);
+
+        addOffSetBgForText();
         updateTime();
         startRealtimeUpdates();
+    }
+
+    private void addOffSetBgForText() {
+        // 计算偏移量（示例：偏移半个字符宽度/高度）
+        float textSize = qaText.getTextSize(); // 获取当前文本大小
+        float offsetX = 0;  // 向右偏移
+        float offsetY = (float) (textSize * 0.7);  // 向下偏移
+        OffsetBackgroundSpan span = new OffsetBackgroundSpan(
+                Color.parseColor("#006AFF"),
+                offsetX,
+                offsetY,
+                textSize
+        );
+        //得加点空格，要不最后一行下面没有行间距，导致偏移的部分被crop了
+        SpannableStringBuilder spannableText = new SpannableStringBuilder("完备的政策文件库，强大的搜索匹配能力\n语音对话，问你所想，打造交互新模式\n大模型智能问答，精准政策解析回复\n                  ");
+        String target = "完备的政策文件库，强大的搜索匹配能力\n语音对话，问你所想，打造交互新模式\n大模型智能问答，精准政策解析回复";
+        spannableText.setSpan(
+                span,
+                0,   // 起始位置
+                target.length(),   // 结束位置（不包含）
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+        qaText.setText(spannableText);
+        span = new OffsetBackgroundSpan(
+                Color.parseColor("#7B59FF"),
+                offsetX,
+                offsetY,
+                textSize
+        );
+        spannableText = new SpannableStringBuilder("“我可以带你去参展公司展位”\n                  ");
+        target = "我可以带你去参展公司展位\n";
+        spannableText.setSpan(
+                span,
+                0,   // 起始位置
+                target.length(),   // 结束位置（不包含）
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+        span = new OffsetBackgroundSpan(
+                Color.parseColor("#00B170"),
+                offsetX,
+                offsetY,
+                textSize
+        );
+        guideText.setText(spannableText);
+        spannableText = new SpannableStringBuilder("社保信息定制岗位推荐\n自定义岗位推荐\n                  ");
+        target = "社保信息定制岗位推荐\n自定义岗位推荐\n";
+        spannableText.setSpan(
+                span,
+                0,   // 起始位置
+                target.length(),   // 结束位置（不包含）
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+        span = new OffsetBackgroundSpan(
+                Color.parseColor("#FF7813"),
+                offsetX,
+                offsetY,
+                textSize
+        );
+        introText.setText(spannableText);
+        spannableText = new SpannableStringBuilder("在线面试\n智能、高效、快捷、直聘\n                  ");
+        target = "在线面试\n";
+        spannableText.setSpan(
+                span,
+                0,   // 起始位置
+                target.length(),   // 结束位置（不包含）
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+        remoteText.setText(spannableText);
     }
 
     @Override
