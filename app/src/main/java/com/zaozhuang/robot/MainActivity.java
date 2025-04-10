@@ -129,14 +129,20 @@ public class MainActivity extends AppCompatActivity {
             case MEN_TALKING:
                 mTalkingStateText.setText("语音接收中...");
                 mWaveAnim.setVisibility(View.VISIBLE);
+//                mWaveAnim.setProgress(0f);    // 重置到起点
+//                mWaveAnim.playAnimation();    // 重新播放
                 break;
             case ROBOT_THINKING:
                 mTalkingStateText.setText("大模型思考中...");
                 mWaveAnim.setVisibility(View.VISIBLE);
+//                mWaveAnim.setProgress(0f);    // 重置到起点
+//                mWaveAnim.playAnimation();    // 重新播放
                 break;
             case ROBOT_ANSWERING:
                 mTalkingStateText.setText("机器人回答中...");
                 mWaveAnim.setVisibility(View.VISIBLE);
+//                mWaveAnim.setProgress(0f);    // 重置到起点
+//                mWaveAnim.playAnimation();    // 重新播放
                 break;
             default:
         }
@@ -162,41 +168,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void simulateUserInput(int step) {
-        // 添加用户消息
-        ChatMessage userMessage = new ChatMessage(false);
-        adapter.messages.add(userMessage);
-        int position = adapter.messages.size() - 1;
-        adapter.notifyItemInserted(position);
-        setTalkingState(MEN_TALKING);
-        // 逐个字符显示
-        new Thread(() -> {
-            String text = personArr[step];
-            for (int i = 0; i < text.length(); i++) {
-                final int finalI = i;
-                handler.post(() -> {
-                    adapter.updateMessage(position, String.valueOf(text.charAt(finalI)));
-                    ((LinearLayoutManager) recyclerView.getLayoutManager())
-                            .scrollToPosition(position);
-                });
-                try {
-                    Thread.sleep(150);
-                } catch (InterruptedException e) {
+        setTalkingState(IDLE);
+        handler.postDelayed(() -> {
+            // 添加用户消息
+            ChatMessage userMessage = new ChatMessage(false);
+            adapter.messages.add(userMessage);
+            int position = adapter.messages.size() - 1;
+            adapter.notifyItemInserted(position);
+            setTalkingState(MEN_TALKING);
+            // 逐个字符显示
+            new Thread(() -> {
+                String text = personArr[step];
+                for (int i = 0; i < text.length(); i++) {
+                    final int finalI = i;
+                    handler.post(() -> {
+                        adapter.updateMessage(position, String.valueOf(text.charAt(finalI)));
+                        ((LinearLayoutManager) recyclerView.getLayoutManager())
+                                .scrollToPosition(position);
+                    });
+                    try {
+                        Thread.sleep(150);
+                    } catch (InterruptedException e) {
+                    }
                 }
-            }
-            handler.post(() -> {
-                userMessage.setCompleted(true);
-                simulateBotResponse(step);
-            });
-        }).start();
+                handler.post(() -> {
+                    userMessage.setCompleted(true);
+                    simulateBotResponse(step);
+                });
+            }).start();
+        }, 2000);
+
     }
 
     private void simulateBotResponse(int step) {
-        // 添加机器人消息
-        ChatMessage botMessage = new ChatMessage(true);
-        adapter.messages.add(botMessage);
-        int position = adapter.messages.size() - 1;
         setTalkingState(ROBOT_THINKING);
         handler.postDelayed(() -> {
+                    // 添加机器人消息
+                    ChatMessage botMessage = new ChatMessage(true);
+                    adapter.messages.add(botMessage);
+                    int position = adapter.messages.size() - 1;
                     adapter.notifyItemInserted(position);
                     setTalkingState(ROBOT_ANSWERING);
                     // 逐个字符显示
