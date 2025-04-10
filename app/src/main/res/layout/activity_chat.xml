@@ -5,10 +5,14 @@
     android:orientation="vertical"
     android:paddingLeft="8dp"
     android:paddingRight="8dp">
-
+    <!--枣庄人社机器人标题-->
     <include
         android:id="@+id/included_header"
         layout="@layout/chat_header" />
+    <!--大模型智能对话相关UI-->
+    <include
+        android:id="@+id/included_conversation"
+        layout="@layout/chat_title" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
