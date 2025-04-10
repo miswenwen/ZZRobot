@@ -1,11 +1,13 @@
 package com.zaozhuang.robot;
 
+import android.animation.ValueAnimator;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -17,7 +19,14 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +40,9 @@ import com.zaozhuang.robot.view.OffsetBackgroundSpan;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -69,10 +80,172 @@ public class WelcomeActivity extends AppCompatActivity {
         remoteText = findViewById(R.id.remote_tv);
 
         addOffSetBgForText();
+        initFlowAnim();
         updateTime();
         startRealtimeUpdates();
     }
+    private static final int GRID_SIZE = 3; // 3x3网格
+    private RelativeLayout container;
+    private int cellWidth, cellHeight;
+    private static final int TEXTVIEW_COUNT = 8;
+    private static final int CONTAINER_HEIGHT_DP = 200;
+    private int containerWidth;
+    private void initFlowAnim() {
+        container = findViewById(R.id.container);
+        container.post(() -> {
+            // 获取容器实际尺寸
+            int totalWidth = container.getWidth();
+            int totalHeight = container.getHeight();
 
+            // 计算单元格尺寸
+            cellWidth = totalWidth / GRID_SIZE;
+            cellHeight = totalHeight / GRID_SIZE;
+
+            // 生成随机数量（4-7）
+            int z = new Random().nextInt(3) + 4;
+
+            // 生成布局
+            container.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    // 获取容器实际宽度
+                    containerWidth = container.getWidth();
+                    createViews(z);
+                    startAnimation();
+                    container.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+
+            });
+        });
+    }
+    private void createViews(int count) {
+        // 生成不重复的随机位置
+        List<Integer> positions = new ArrayList<>();
+        for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+            positions.add(i);
+        }
+        Collections.shuffle(positions);
+
+        // 创建指定数量的视图
+        for (int i = 0; i < count; i++) {
+            int pos = positions.get(i);
+            addViewToCell(pos,i);
+        }
+    }
+
+    private void addViewToCell(int cellPosition,int i) {
+        // 计算单元格坐标
+        int row = cellPosition / GRID_SIZE;
+        int col = cellPosition % GRID_SIZE;
+
+        // 创建新视图
+        TextView tv = new TextView(this);
+        tv.setText("今天参展企业有哪些 " + (i + 1));
+        tv.setTextSize(24);
+        tv.setPadding(16, 16, 16, 16);
+        // 创建圆角透明背景
+        GradientDrawable bgShape = new GradientDrawable();
+        bgShape.setShape(GradientDrawable.RECTANGLE);
+        bgShape.setCornerRadius(36);  // 8dp圆角
+        bgShape.setOrientation(GradientDrawable.Orientation.TOP_BOTTOM);
+        bgShape.setColors(new int[]{
+                Color.parseColor("#5AB4FF"),
+                Color.parseColor("#1E99FF")
+        });
+        // 可选添加白色边框
+        bgShape.setStroke(1, Color.WHITE);
+        tv.setBackground(bgShape);
+        tv.setTextColor(Color.WHITE);
+        tv.setGravity(Gravity.CENTER);
+
+        // 设置布局参数
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        // 测量视图实际尺寸
+        tv.measure(View.MeasureSpec.makeMeasureSpec(cellWidth, View.MeasureSpec.AT_MOST),
+                View.MeasureSpec.makeMeasureSpec(cellHeight, View.MeasureSpec.AT_MOST));
+        int viewWidth = tv.getMeasuredWidth();
+        int viewHeight = tv.getMeasuredHeight();
+        // 计算最大可偏移范围（考虑安全边距）
+        int maxHorizontalOffset = cellWidth - viewWidth - dpToPx(4); // 左右各留2dp边距
+        int maxVerticalOffset = cellHeight - viewHeight - dpToPx(4); // 上下各留2dp边距
+
+        // 生成随机位置
+        Random random = new Random();
+        int leftMargin = col * cellWidth + dpToPx(2) +
+                (maxHorizontalOffset > 0 ? random.nextInt(maxHorizontalOffset) : 0);
+        int topMargin = row * cellHeight + dpToPx(2) +
+                (maxVerticalOffset > 0 ? random.nextInt(maxVerticalOffset) : 0);
+        params.leftMargin = Math.max(0, leftMargin);
+        params.topMargin = Math.max(0, topMargin);
+
+//        params.leftMargin = col * cellWidth;
+//        params.topMargin = row * cellHeight;
+
+        container.addView(tv, params);
+        startAnimation();
+    }
+    private void initTextViews() {
+        Random random = new Random();
+        int containerHeightPx = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, CONTAINER_HEIGHT_DP,
+                getResources().getDisplayMetrics());
+
+        for (int i = 0; i < TEXTVIEW_COUNT; i++) {
+            TextView tv = new TextView(this);
+            tv.setText("Item " + (i + 1));
+            tv.setTextSize(16);
+            tv.setPadding(32, 16, 32, 16);
+            tv.setBackgroundColor(Color.parseColor("#4CAF50"));
+            tv.setTextColor(Color.WHITE);
+
+            // 随机初始化位置
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT);
+            params.leftMargin = random.nextInt(containerWidth);
+            params.topMargin = random.nextInt(containerHeightPx - dpToPx(48));
+            container.addView(tv, params);
+        }
+    }
+
+    private void startAnimation() {
+        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+        animator.setRepeatCount(ValueAnimator.INFINITE);
+        animator.setDuration(15000); // 总动画时长
+        animator.setInterpolator(new LinearInterpolator());
+
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                long currentTime = System.currentTimeMillis();
+
+                for (int i = 0; i < container.getChildCount(); i++) {
+                    View child = container.getChildAt(i);
+                    float speed = 0.4f; // 控制移动速度
+
+                    // 计算新的X位置
+                    float newX = child.getX() - speed;
+
+                    // 循环检测
+                    if (newX + child.getWidth() < 0) {
+                        newX = containerWidth;
+                    }
+
+                    child.setX(newX);
+                }
+            }
+        });
+        animator.start();
+    }
+
+    private int dpToPx(int dp) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp,
+                getResources().getDisplayMetrics());
+    }
     private void addOffSetBgForText() {
         // 计算偏移量（示例：偏移半个字符宽度/高度）
         float textSize = qaText.getTextSize(); // 获取当前文本大小
