@@ -92,13 +92,29 @@ class Job {
     private final String company;
     private final String location;
     private final String salary;
-
-    public Job(String title, String company,
-               String location, String salary) {
+    private  boolean supportsBoothGuidance;
+    private  boolean supportsRemoteInterview;
+    private  boolean supportsResumeDelivery;
+    public Job(String title, String company, String location, String salary) {
         this.title = title;
         this.company = company;
         this.location = location;
         this.salary = salary;
+        this.supportsBoothGuidance = false;
+        this.supportsRemoteInterview = false;
+        this.supportsResumeDelivery = true;
+    }
+    public Job(String title, String company, String location, String salary,
+               boolean supportsBoothGuidance, boolean supportsRemoteInterview,
+               boolean supportsResumeDelivery) {
+        this.title = title;
+        this.company = company;
+        this.location = location;
+        this.salary = salary;
+        this.supportsBoothGuidance = supportsBoothGuidance;
+        this.supportsRemoteInterview = supportsRemoteInterview;
+//        this.supportsResumeDelivery = supportsResumeDelivery;
+        this.supportsResumeDelivery = !supportsBoothGuidance;
     }
 
     // Getter 方法
@@ -116,5 +132,16 @@ class Job {
 
     public String getSalary() {
         return salary;
+    }
+    public boolean isSupportsBoothGuidance() {
+        return supportsBoothGuidance;
+    }
+
+    public boolean isSupportsRemoteInterview() {
+        return supportsRemoteInterview;
+    }
+
+    public boolean isSupportsResumeDelivery() {
+        return supportsResumeDelivery;
     }
 }

@@ -1,36 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
-    android:orientation="horizontal"
-    android:padding="16dp">
+    android:layout_height="160px"
+    android:orientation="horizontal">
 
-    <!-- 左侧文本 -->
-    <TextView
-        android:id="@+id/tv_left"
+    <!--左侧文本-->
+    <RelativeLayout
+        android:id="@+id/left_title_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textSize="16sp"/>
-
-    <!-- 右侧可点击区域 -->
-    <LinearLayout
-        android:id="@+id/right_container"
-        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:layout_weight="1">
 
         <TextView
-            android:id="@+id/tv_right"
+            android:id="@+id/title"
+            android:layout_marginTop="32px"
+            android:textSize="36px"
+            android:textColor="#0386F2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="操作"
-            android:textColor="#2196F3"/>
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/company"
+            android:textSize="24px"
+            android:textColor="#0386F2"
+            android:layout_alignLeft="@id/title"
+            android:layout_below="@id/title"
+            android:layout_marginTop="16px"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/salary"
+            android:textSize="24px"
+            android:layout_alignBaseline="@id/title"
+            android:layout_toRightOf="@id/title"
+            android:textColor="#5EA7F1"
+            android:layout_marginLeft="20px"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+    <!--右侧按钮-->
+    <LinearLayout
+        android:id="@+id/right_btns"
+        android:layout_width="194px"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="32px"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/guide_btn"
+            android:layout_width="194px"
+            android:layout_height="60px"
+            android:drawableLeft="@drawable/guide_icon"
+            android:background="@drawable/purple_gradient_bg"
+            android:text="展位引导"
+            android:textColor="@color/white"
+            android:textSize="28px"
+            android:gravity="center"
+            android:layout_marginBottom="8px"
+            />
+        <TextView
+            android:id="@+id/remote_btn"
+            android:layout_width="194px"
+            android:layout_height="60px"
+            android:drawableLeft="@drawable/camera_icon"
+            android:background="@drawable/orange_gradient_bg"
+            android:text="远程面试"
+            android:textColor="@color/white"
+            android:textSize="28px"
+            android:gravity="center"
+            android:layout_marginBottom="8px"
+            />
+        <TextView
+            android:id="@+id/deliver_btn"
+            android:layout_width="194px"
+            android:layout_height="60px"
+            android:drawableLeft="@drawable/guide_icon"
+            android:background="@drawable/cyan_gradient_bg"
+            android:text="投递简历"
+            android:textColor="@color/white"
+            android:textSize="28px"
+            android:gravity="center"
+            />
     </LinearLayout>
 
 </LinearLayout>

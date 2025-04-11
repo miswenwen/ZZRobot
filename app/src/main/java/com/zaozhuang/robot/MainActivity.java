@@ -86,7 +86,8 @@ public class MainActivity extends AppCompatActivity {
         startRealtimeUpdates();
         setTalkingState(IDLE);
     }
-    private void initView(){
+
+    private void initView() {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ChatAdapter(new ArrayList<>());
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         robotMsgList = new ArrayList<>();
         for (String msg : robotArr) {
             RobotMsgItem item = new RobotMsgItem(msg);
-            if(msg.contains("适合您的岗位如下")){
+            if (msg.contains("适合您的岗位如下")) {
                 item.type = 1;
             }
             robotMsgList.add(item);
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
             // 逐个字符显示
             new Thread(() -> {
                 String text = userMessage.getContent();
-                Log.e("potteraaa",text);
+                Log.e("potteraaa", text);
                 for (int i = 0; i < text.length(); i++) {
                     final int finalI = i;
                     handler.post(() -> {
@@ -207,30 +208,39 @@ public class MainActivity extends AppCompatActivity {
         setTalkingState(ROBOT_THINKING);
         handler.postDelayed(() -> {
                     // 添加机器人消息
-            ChatMessage botMessage;
-                    if(robotMsgList.get(step).type == 0){
+                    ChatMessage botMessage;
+                    if (robotMsgList.get(step).type == 0) {
                         botMessage = ChatMessage.createBotTextMessage(robotMsgList.get(step).content);
-                    }else if(robotMsgList.get(step).type == 1){
+                    } else if (robotMsgList.get(step).type == 1) {
                         List<Job> jobs = new ArrayList<Job>() {{
                             add(new Job(
                                     "Java开发工程师",
                                     "字节跳动",
                                     "北京",
-                                    "25-40K·16薪"
+                                    "25-40K·16薪",
+                                    true,
+                                    true,
+                                    true
                             ));
 
                             add(new Job(
                                     "Android开发专家",
                                     "腾讯科技",
                                     "深圳",
-                                    "30-50K·14薪"
+                                    "30-50K·14薪",
+                                    true,
+                                    false,
+                                    true
                             ));
 
                             add(new Job(
                                     "大数据平台开发",
                                     "阿里巴巴集团",
                                     "杭州",
-                                    "20-35K·股票期权"
+                                    "20-35K·股票期权",
+                                    false,
+                                    true,
+                                    true
                             ));
 
                             add(new Job(
@@ -247,8 +257,8 @@ public class MainActivity extends AppCompatActivity {
                                     "18-30K·弹性工作"
                             ));
                         }};
-                        botMessage = ChatMessage.createBotJobMessage(robotMsgList.get(step).content,jobs);
-                    }else {
+                        botMessage = ChatMessage.createBotJobMessage(robotMsgList.get(step).content, jobs);
+                    } else {
                         botMessage = ChatMessage.createUserMessage(robotMsgList.get(step).content);
                     }
                     adapter.messages.add(botMessage);

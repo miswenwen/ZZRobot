@@ -34,5 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="600px"
         android:background="@drawable/radius_white_bg"
+        android:paddingLeft="32px"
+        android:paddingRight="32px"
         android:scrollbars="vertical"/>
 </LinearLayout>

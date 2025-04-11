@@ -46,12 +46,17 @@ public class JobListAdapter extends BaseAdapter {
         }
 
         Job item = getItem(position);
-        holder.tvLeft.setText(item.getCompany());
+        holder.title_tv.setText(item.getTitle());
+        holder.company_tv.setText(item.getCompany());
+        holder.salary_tv.setText(item.getSalary());
+        holder.guide_btn.setVisibility(item.isSupportsBoothGuidance()?View.VISIBLE:View.GONE);
+        holder.remote_btn.setVisibility(item.isSupportsRemoteInterview()?View.VISIBLE:View.GONE);
+        holder.deliver_btn.setVisibility(item.isSupportsResumeDelivery()?View.VISIBLE:View.GONE);
 
-        // 设置右侧点击事件
-        holder.rightContainer.setOnClickListener(v -> {
+        holder.deliver_btn.setOnClickListener(v -> {
             Toast.makeText(parent.getContext(),
-                    "点击项: " + item.getSalary(), Toast.LENGTH_SHORT).show();
+                    "投递成功", Toast.LENGTH_SHORT).show();
+            holder.deliver_btn.setText("已投递");
         });
 
         return convertView;
@@ -60,10 +65,21 @@ public class JobListAdapter extends BaseAdapter {
     class ViewHolder {
         TextView tvLeft;
         LinearLayout rightContainer;
+        TextView title_tv;
+        TextView company_tv;
+        TextView salary_tv;
+        TextView guide_btn;
+        TextView remote_btn;
+        TextView deliver_btn;
 
         ViewHolder(View view) {
-            tvLeft = view.findViewById(R.id.tv_left);
-            rightContainer = view.findViewById(R.id.right_container);
+            title_tv = view.findViewById(R.id.title);
+            company_tv = view.findViewById(R.id.company);
+            salary_tv = view.findViewById(R.id.salary);
+            guide_btn = view.findViewById(R.id.guide_btn);
+            remote_btn = view.findViewById(R.id.remote_btn);
+            deliver_btn = view.findViewById(R.id.deliver_btn);
+
         }
     }
     class DataItem {
