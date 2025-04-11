@@ -35,6 +35,7 @@
         <activity android:name=".HttpTest" />
         <activity android:name=".FaceDetectionActivity" />
         <activity android:name=".WelcomeActivity" />
+        <activity android:name=".QrCodeActivity"/>
     </application>
 
 </manifest>

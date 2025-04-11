@@ -17,6 +17,7 @@ public class HomeActivity extends AppCompatActivity {
     Button talkBtn;
     Button faceDetectionBtn;
     Button robotFuc;
+    Button qrCodeBtn;
     TextView dmDensityText;
 
     @Override
@@ -27,7 +28,9 @@ public class HomeActivity extends AppCompatActivity {
         talkBtn = (Button) findViewById(R.id.talk);
         faceDetectionBtn = (Button) findViewById(R.id.face_detection);
         robotFuc = (Button) findViewById(R.id.robot_func);
+        qrCodeBtn = (Button) findViewById(R.id.qr_code_btn);
         dmDensityText = (TextView) findViewById(R.id.dm_density);
+
         meetingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,6 +56,13 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(HomeActivity.this, WelcomeActivity.class);
+                startActivity(intent);
+            }
+        });
+        qrCodeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeActivity.this, QrCodeActivity.class);
                 startActivity(intent);
             }
         });

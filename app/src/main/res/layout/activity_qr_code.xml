@@ -8,34 +8,28 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/meeting"
+        android:id="@+id/generate_qr_code_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="无感启动腾讯会议"/>
-    <Button
-        android:id="@+id/talk"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="模拟语音通话IM样式"/>
-    <Button
-        android:id="@+id/face_detection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="人脸识别(迎宾用)"/>
-    <Button
-        android:id="@+id/qr_code_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="二维码相关"/>
+        android:text="生成二维码"/>
     <TextView
-        android:id="@+id/dm_density"
+        android:id="@+id/qr_code_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="分辨率"
         />
+    <ImageView
+        android:id="@+id/qr_code_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
     <Button
-        android:id="@+id/robot_func"
+        android:id="@+id/identify_qr_code_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="演示用(processing)"/>
+        android:text="识别二维码"/>
+    <TextView
+        android:id="@+id/qr_code_info2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
 </LinearLayout>
