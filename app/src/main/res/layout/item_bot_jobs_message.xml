@@ -29,7 +29,8 @@
             android:textSize="@dimen/talk_tile_icon_text_size"
             android:visibility="gone" />
     </LinearLayout>
-    <ListView
+    <com.zaozhuang.robot.view.NestedListView
+        android:listSelector="@android:color/transparent"
         android:id="@+id/job_list"
         android:layout_width="match_parent"
         android:layout_height="600px"
