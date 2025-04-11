@@ -3,11 +3,13 @@ package com.zaozhuang.robot;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -114,14 +116,20 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     static class BotJobViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
+        private ListView listView;
+        private List<Job> jobs = new ArrayList<>();
 
         public BotJobViewHolder(View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tvMessage);
+            listView = itemView.findViewById(R.id.job_list);
+
         }
 
         void bind(ChatMessage message) {
             tvMessage.setText(message.getText());
+            JobListAdapter adapter = new JobListAdapter(message.getJobs());
+            listView.setAdapter(adapter);
         }
     }
 }

@@ -29,9 +29,10 @@
             android:textSize="@dimen/talk_tile_icon_text_size"
             android:visibility="gone" />
     </LinearLayout>
-    <LinearLayout
+    <ListView
+        android:id="@+id/job_list"
         android:layout_width="match_parent"
         android:layout_height="600px"
-        android:background="@drawable/radius_white_bg">
-    </LinearLayout>
+        android:background="@drawable/radius_white_bg"
+        android:scrollbars="vertical"/>
 </LinearLayout>
