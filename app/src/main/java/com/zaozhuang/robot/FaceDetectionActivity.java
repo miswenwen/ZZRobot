@@ -47,6 +47,8 @@ public class FaceDetectionActivity extends AppCompatActivity {
 
     private ImageView imageView;
 
+    private boolean isRobot = true;//false则是自己的手机调试， robot和手机预览还有采集帧方向去完全是乱的，得手动调整，坑逼
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +61,7 @@ public class FaceDetectionActivity extends AppCompatActivity {
 
         // 请求摄像头权限
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            startCamera();
+            startCamera(true);
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
         }
@@ -69,26 +71,19 @@ public class FaceDetectionActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_PERMISSION_REQUEST && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            startCamera();
+            startCamera(true);
         }
     }
 
     private long lastProcessTime = 0;
     private final long MIN_INTERVAL_MS = 500; // 例如：500ms 处理一次
 
-    private void startCamera() {
+    //实际做迎宾功能的时候不需要preview，给false
+    private void startCamera(boolean hasPreview) {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-
-                //设置为COMPATIBLE和setTargetRotation(previewView.getDisplay().getRotation())，fix 机器人预览图像方向不对的问题
-                previewView.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE);
-                // 配置预览
-                Preview preview = new Preview.Builder().
-                        setTargetRotation(previewView.getDisplay().getRotation()).
-                        build();
-                preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
                 // 配置图像分析
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
@@ -113,15 +108,32 @@ public class FaceDetectionActivity extends AppCompatActivity {
                 cameraProvider.unbindAll();
                 //LENS_FACING_BACK/LENS_FACING_FRONT/LENS_FACING_EXTERNAL
                 //实测机器人的外接摄像头竟然是LENS_FACING_BACK，而不是LENS_FACING_EXTERNAL
+                int lensFacing = isRobot ? CameraSelector.LENS_FACING_BACK : CameraSelector.LENS_FACING_FRONT;
                 CameraSelector cameraSelector = new CameraSelector.Builder()
-                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                        .requireLensFacing(lensFacing)
                         .build();
-                cameraProvider.bindToLifecycle(
-                        this,
-                        cameraSelector,//前后摄
-                        preview,
-                        imageAnalysis
-                );
+                if (hasPreview) {
+                    //设置为COMPATIBLE和setTargetRotation(previewView.getDisplay().getRotation())，fix 机器人预览图像方向不对的问题
+                    previewView.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE);
+                    // 配置预览
+                    Preview preview = new Preview.Builder().
+                            setTargetRotation(previewView.getDisplay().getRotation()).
+                            build();
+                    preview.setSurfaceProvider(previewView.getSurfaceProvider());
+                    cameraProvider.bindToLifecycle(
+                            this,
+                            cameraSelector,//前后摄
+                            preview,
+                            imageAnalysis
+                    );
+                } else {
+                    cameraProvider.bindToLifecycle(
+                            this,
+                            cameraSelector,//前后摄
+                            imageAnalysis
+                    );
+                }
+
             } catch (ExecutionException | InterruptedException e) {
                 Log.e("CameraX", "Error starting camera", e);
             }
@@ -184,17 +196,19 @@ public class FaceDetectionActivity extends AppCompatActivity {
 
     // 将 ImageProxy（YUV）转换为 Bitmap（RGB）
     private Bitmap imageProxyToBitmap(ImageProxy imageProxy) {
-        return imageProxy.toBitmap();
-//        //实测手机上前摄toBitmap的图片是横着的，得旋转下
-//        int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
-//        Bitmap bitmap = imageProxy.toBitmap();
-//        Matrix matrix = new Matrix();
-//        matrix.postRotate(rotationDegrees);
-//        // 创建一个新的Bitmap，其内容是旋转后的图像
-//        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-//        // 如果不再需要原始bitmap，可以回收它
-//        bitmap.recycle();
-//        return rotatedBitmap;
+        if (isRobot) {
+            return imageProxy.toBitmap();
+        }
+        //实测手机上前摄toBitmap的图片是横着的，得旋转下
+        int rotationDegrees = imageProxy.getImageInfo().getRotationDegrees();
+        Bitmap bitmap = imageProxy.toBitmap();
+        Matrix matrix = new Matrix();
+        matrix.postRotate(rotationDegrees);
+        // 创建一个新的Bitmap，其内容是旋转后的图像
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        // 如果不再需要原始bitmap，可以回收它
+        bitmap.recycle();
+        return rotatedBitmap;
     }
 
     @Override
