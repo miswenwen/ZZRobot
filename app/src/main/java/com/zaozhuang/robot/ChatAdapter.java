@@ -11,8 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    // 主视图类型
     private static final int TYPE_USER = 0;
-    private static final int TYPE_BOT = 1;
+    private static final int TYPE_BOT_TEXT = 1;
+    private static final int TYPE_BOT_JOBS = 2;
+    private static final int TYPE_BOT_POLICY = 3;
     final List<ChatMessage> messages;
 
     public ChatAdapter(List<ChatMessage> messages) {
@@ -21,17 +24,38 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        return messages.get(position).isBot() ? TYPE_BOT : TYPE_USER;
+        ChatMessage msg = messages.get(position);
+        if (msg.getMainType() == ChatMessage.TYPE_USER) {
+            return TYPE_USER;
+        } else {
+            // 根据机器人子类型返回不同视图类型
+            switch (msg.getBotSubType()) {
+                case ChatMessage.BOT_TYPE_JOBS:
+                    return TYPE_BOT_JOBS;
+                case ChatMessage.BOT_TYPE_POLICY:
+                    return TYPE_BOT_POLICY;
+                default: // 默认文本类型
+                    return TYPE_BOT_TEXT;
+            }
+        }
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        if (viewType == TYPE_BOT) {
-            return new BotViewHolder(inflater.inflate(R.layout.item_bot_message, parent, false));
+        switch (viewType) {
+            case TYPE_BOT_JOBS:
+                return new BotJobViewHolder(
+                        inflater.inflate(R.layout.item_bot_jobs_message, parent, false)
+                );
+            case TYPE_BOT_POLICY:
+                return new BotViewHolder(inflater.inflate(R.layout.item_bot_message, parent, false));
+            case TYPE_BOT_TEXT:
+                return new BotViewHolder(inflater.inflate(R.layout.item_bot_message, parent, false));
+            default: // 用户消息
+                return new UserViewHolder(inflater.inflate(R.layout.item_user_message, parent, false));
         }
-        return new UserViewHolder(inflater.inflate(R.layout.item_user_message, parent, false));
     }
 
     @Override
@@ -39,8 +63,10 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         ChatMessage message = messages.get(position);
         if (holder instanceof UserViewHolder) {
             ((UserViewHolder) holder).bind(message);
-        } else {
+        } else if (holder instanceof BotViewHolder) {
             ((BotViewHolder) holder).bind(message);
+        } else if (holder instanceof BotJobViewHolder) {
+            ((BotJobViewHolder) holder).bind(message);
         }
     }
 
@@ -77,6 +103,19 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView tvMessage;
 
         public BotViewHolder(View itemView) {
+            super(itemView);
+            tvMessage = itemView.findViewById(R.id.tvMessage);
+        }
+
+        void bind(ChatMessage message) {
+            tvMessage.setText(message.getText());
+        }
+    }
+
+    static class BotJobViewHolder extends RecyclerView.ViewHolder {
+        TextView tvMessage;
+
+        public BotJobViewHolder(View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tvMessage);
         }

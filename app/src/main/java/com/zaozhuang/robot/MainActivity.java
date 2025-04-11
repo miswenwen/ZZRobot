@@ -23,6 +23,7 @@ import com.helang.lib.IMyAidlInterface;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -42,28 +43,20 @@ public class MainActivity extends AppCompatActivity {
     String[] personArr = {
             "你好！",
             "今天天气怎么样？",
-            "能推荐附近的美食吗？",
+            "能推荐下岗位吗？",
             "谢谢你的帮助",
             "再见！",
-            "111！",
-            "222！",
-            "333！",
-            "444！",
-            "555！"
     };
 
     String[] robotArr = {
             "您好！很高兴为您服务",
             "今天晴转多云，气温25-30℃",
-            "附近评分较高的餐厅有：1. XX火锅 2. XX日料",
+            "适合您的岗位如下",
             "不客气，随时为您服务",
             "再见！祝您有美好的一天",
-            "aa",
-            "bbbb",
-            "cccc",
-            "ddddddd",
-            "再见！祝您有美好的一天"
     };
+    List<RobotMsgItem> robotMsgList = new ArrayList<>();
+
     private ChatAdapter adapter;
     private int currentStep = 0;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -87,22 +80,31 @@ public class MainActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_chat);
         bindService();
+        initView();
+        startConversation();
+        updateTime();
+        startRealtimeUpdates();
+        setTalkingState(IDLE);
+    }
+    private void initView(){
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ChatAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
         //很重要，解决模拟打字的闪烁问题
         recyclerView.setItemAnimator(null);
-        startConversation();
-
         tvTime = findViewById(R.id.tv_time);
         tvDate = findViewById(R.id.tv_date);
-        updateTime();
-        startRealtimeUpdates();
-
         mTalkingStateText = (TextView) findViewById(R.id.talking_stata_text);
         mWaveAnim = (LottieAnimationView) findViewById(R.id.wave_anim);
-        setTalkingState(IDLE);
+        robotMsgList = new ArrayList<>();
+        for (String msg : robotArr) {
+            RobotMsgItem item = new RobotMsgItem(msg);
+            if(msg.contains("适合您的岗位如下")){
+                item.type = 1;
+            }
+            robotMsgList.add(item);
+        }
     }
 
     @Override
@@ -171,14 +173,15 @@ public class MainActivity extends AppCompatActivity {
         setTalkingState(IDLE);
         handler.postDelayed(() -> {
             // 添加用户消息
-            ChatMessage userMessage = new ChatMessage(false);
+            ChatMessage userMessage = ChatMessage.createUserMessage(personArr[step]);
             adapter.messages.add(userMessage);
             int position = adapter.messages.size() - 1;
             adapter.notifyItemInserted(position);
             setTalkingState(MEN_TALKING);
             // 逐个字符显示
             new Thread(() -> {
-                String text = personArr[step];
+                String text = userMessage.getContent();
+                Log.e("potteraaa",text);
                 for (int i = 0; i < text.length(); i++) {
                     final int finalI = i;
                     handler.post(() -> {
@@ -204,14 +207,57 @@ public class MainActivity extends AppCompatActivity {
         setTalkingState(ROBOT_THINKING);
         handler.postDelayed(() -> {
                     // 添加机器人消息
-                    ChatMessage botMessage = new ChatMessage(true);
+            ChatMessage botMessage;
+                    if(robotMsgList.get(step).type == 0){
+                        botMessage = ChatMessage.createBotTextMessage(robotMsgList.get(step).content);
+                    }else if(robotMsgList.get(step).type == 1){
+                        List<Job> jobs = new ArrayList<Job>() {{
+                            add(new Job(
+                                    "Java开发工程师",
+                                    "字节跳动",
+                                    "北京",
+                                    "25-40K·16薪"
+                            ));
+
+                            add(new Job(
+                                    "Android开发专家",
+                                    "腾讯科技",
+                                    "深圳",
+                                    "30-50K·14薪"
+                            ));
+
+                            add(new Job(
+                                    "大数据平台开发",
+                                    "阿里巴巴集团",
+                                    "杭州",
+                                    "20-35K·股票期权"
+                            ));
+
+                            add(new Job(
+                                    "移动端架构师",
+                                    "美团平台",
+                                    "上海",
+                                    "40-60K·技术分红"
+                            ));
+
+                            add(new Job(
+                                    "跨平台开发工程师",
+                                    "快手科技",
+                                    "广州",
+                                    "18-30K·弹性工作"
+                            ));
+                        }};
+                        botMessage = ChatMessage.createBotJobMessage(robotMsgList.get(step).content,jobs);
+                    }else {
+                        botMessage = ChatMessage.createUserMessage(robotMsgList.get(step).content);
+                    }
                     adapter.messages.add(botMessage);
                     int position = adapter.messages.size() - 1;
                     adapter.notifyItemInserted(position);
                     setTalkingState(ROBOT_ANSWERING);
                     // 逐个字符显示
                     new Thread(() -> {
-                        String text = robotArr[step];
+                        String text = botMessage.getContent();
                         for (int i = 0; i < text.length(); i++) {
                             final int finalI = i;
                             handler.post(() -> {
