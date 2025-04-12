@@ -42,7 +42,7 @@ import android.media.FaceDetector;
 public class FaceDetectionActivity extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_REQUEST = 100;
     private PreviewView previewView;
-    private TextView tvWelcome;
+    private TextView tvWelcome,capture_frame;
     private ExecutorService cameraExecutor;
 
     private ImageView imageView;
@@ -56,6 +56,7 @@ public class FaceDetectionActivity extends AppCompatActivity {
 
         previewView = findViewById(R.id.previewView);
         tvWelcome = findViewById(R.id.tvWelcome);
+        capture_frame = findViewById(R.id.capture_frame);
         imageView = (ImageView) findViewById(R.id.previewImg);
         cameraExecutor = Executors.newSingleThreadExecutor();
 
@@ -117,7 +118,7 @@ public class FaceDetectionActivity extends AppCompatActivity {
                     previewView.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE);
                     // 配置预览
                     Preview preview = new Preview.Builder().
-                            setTargetRotation(previewView.getDisplay().getRotation()).
+                            setTargetRotation(isRobot ? Surface.ROTATION_90 : previewView.getDisplay().getRotation()).
                             build();
                     preview.setSurfaceProvider(previewView.getSurfaceProvider());
                     cameraProvider.bindToLifecycle(
@@ -189,6 +190,7 @@ public class FaceDetectionActivity extends AppCompatActivity {
             } else {
                 tvWelcome.setVisibility(View.GONE);
             }
+            capture_frame.setText("采集帧，采集到人脸数:" + detectedCount);
             imageProxy.close();
         });
 //        imageProxy.close();

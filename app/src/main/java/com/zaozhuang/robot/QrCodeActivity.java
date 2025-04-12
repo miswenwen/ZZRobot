@@ -17,6 +17,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
 
 public class QrCodeActivity extends AppCompatActivity {
@@ -26,6 +27,7 @@ public class QrCodeActivity extends AppCompatActivity {
     TextView identifyQrCodeInfo;
     ImageView qrImg;
     int REQUEST_CODE_SCAN = 1000;
+    int scanWay = 1;//1:IntentIntegrator 2:CaptureActivity 3:自定义逻辑，从视频流获取采集帧，传bitmap识别。最终项目用法
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,11 +48,20 @@ public class QrCodeActivity extends AppCompatActivity {
         identifyQrCodeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                IntentIntegrator integrator = new IntentIntegrator(QrCodeActivity.this);
-//                integrator.setPrompt("扫描二维码");
-//                integrator.initiateScan();
+                if(scanWay == 1){
+                    IntentIntegrator integrator = new IntentIntegrator(QrCodeActivity.this);
+                    integrator.setPrompt("扫描二维码");
+                    integrator.setCameraId(1);  // 指定摄像头
+                    integrator.setBarcodeImageEnabled(true); // 是否生成条码扫描的缩略图。
+                    integrator.initiateScan();
+                } else{
+
                 Intent intent = new Intent(QrCodeActivity.this, CaptureActivity.class);
+                intent.putExtra("SCAN_CAMERA_ID", 1);  // 0为后置摄像头，1为前置摄像头
                 startActivityForResult(intent, REQUEST_CODE_SCAN);
+                }
+
+
             }
         });
 
@@ -59,13 +70,26 @@ public class QrCodeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
-            if (data != null) {
-                String content = data.getStringExtra("SCAN_RESULT");
-                identifyQrCodeInfo.setText("识别的二维码结果为："+content);
-                // 处理扫描结果
+        if(scanWay == 1){
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if(result != null) {
+                if(result.getContents() == null) {
+                    identifyQrCodeInfo.setText("Cancelled");
+                } else {
+                    identifyQrCodeInfo.setText("识别的二维码结果为:" + result.getContents());
+                }
+            }
+        }else{
+            if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
+                if (data != null) {
+                    String content = data.getStringExtra("SCAN_RESULT");
+                    identifyQrCodeInfo.setText("识别的二维码结果为："+content);
+                    // 处理扫描结果
+                }
             }
         }
+
+
     }
     private void generateQrCode(){
         // 参数：内容、尺寸、颜色等
