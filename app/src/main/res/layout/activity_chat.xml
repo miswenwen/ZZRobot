@@ -6,6 +6,14 @@
     android:orientation="vertical"
     android:paddingLeft="@dimen/general_space"
     android:paddingRight="@dimen/general_space">
+    <TextView
+        android:id="@+id/logs"
+        android:layout_width="match_parent"
+        android:background="#00ff00"
+        android:layout_height="500px"
+        android:padding="10dp"
+        android:scrollbars="vertical"
+        />
     <!--枣庄人社机器人标题-->
     <include
         android:id="@+id/included_header"
@@ -16,11 +24,11 @@
         layout="@layout/chat_title" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:background="@color/transparent"
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@color/transparent"
         android:scrollbars="vertical" />
 
     <com.airbnb.lottie.LottieAnimationView

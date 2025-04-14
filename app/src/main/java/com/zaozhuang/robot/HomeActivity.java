@@ -41,7 +41,8 @@ public class HomeActivity extends AppCompatActivity {
         talkBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+//                Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+                Intent intent = new Intent(HomeActivity.this, TalkActivity.class);
                 startActivity(intent);
             }
         });
@@ -89,7 +90,7 @@ public class HomeActivity extends AppCompatActivity {
         int sdkVersion = Build.VERSION.SDK_INT;
         String versionName = Build.VERSION.RELEASE;
         // 输出结果
-        String info = "Device Resolution: " + widthPx + "x" + heightPx + "px\n"
+        String info = "Device Resolution1: " + widthPx + "x" + heightPx + "px\n"
                 + "DPI: " + densityDpi + " (" + densityType + ")\n"
                 + "Density: " + displayMetrics.density + "\n"
                 + "API Level: " + sdkVersion + "\nVersion: " + versionName;

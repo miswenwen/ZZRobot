@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -42,13 +43,7 @@ public class TalkActivity extends AppCompatActivity {
     private ServiceCallBack serviceCallBack;
     private MyServiceConnection myServiceConnection;
     //    private Handler handler = new Handler();
-    private String[] HXAnwar = new String[]{
-            "在呢，你的聊天小伙伴已到位",
-            "嘿嘿，我是大白,冬瓜、西瓜、哈密瓜，你是大白的小傻瓜 ",
-            "你先说什么事，我在决定在不在",
-            "在呢，只要是你，我随时都在哦",
-            "在呢，我就是大白，大是大白的大，白是大白的白"
-    };
+    private String welComeStr = "欢迎使用枣庄人社局智能机器人";
     // 初始化对话数据
     String[] personArr = {
             "你好！",
@@ -72,6 +67,7 @@ public class TalkActivity extends AppCompatActivity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     RecyclerView recyclerView;
     private TextView tvTime, tvDate;
+    private TextView logText;
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
@@ -87,11 +83,9 @@ public class TalkActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_chat);
         bindService();
         initView();
-//        startConversation();
         updateTime();
         startRealtimeUpdates();
         setTalkingState(IDLE);
@@ -100,21 +94,47 @@ public class TalkActivity extends AppCompatActivity {
 
     private void wakeUpMic() {
 //        wake up
-//        给1s延时，保证硬件设备启动完毕
+        Log.e("potter wakeup", iMyAidlInterface != null ? "true" : "false");
+        //post runnable到消息队列尾部，因为不这样bindService还没结束
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startRecord();
+                Log.e("potter wakeup", iMyAidlInterface != null ? "true" : "false");
+                if (iMyAidlInterface != null) {
+                    try {
+                        /**
+                         *  direct 为波束方位 以4麦阵列为例，取值0,1,2, 0为麦克风的第一与第二麦头之间波速,1为中间波速，2为三和四麦头的波速
+                         */
+                        String direct = "0";
+                        iMyAidlInterface.sendMessage("wakeup", direct);
+
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        }, 1000);
+        }, 2000);
     }
 
     private void startRecord() {
         setTalkingState(MEN_TALKING);
+        if (iMyAidlInterface != null) {
+            try {
+                iMyAidlInterface.sendMessage("startrecord", "");
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void stopRecord() {
-
+        if (iMyAidlInterface != null) {
+            try {
+                iMyAidlInterface.sendMessage("stoprecord", "");
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void initView() {
@@ -126,16 +146,11 @@ public class TalkActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(null);
         tvTime = findViewById(R.id.tv_time);
         tvDate = findViewById(R.id.tv_date);
+        logText = (TextView) findViewById(R.id.logs);
+        logText.setMovementMethod(ScrollingMovementMethod.getInstance());
         mTalkingStateText = (TextView) findViewById(R.id.talking_stata_text);
         mWaveAnim = (LottieAnimationView) findViewById(R.id.wave_anim);
         robotMsgList = new ArrayList<>();
-        for (String msg : robotArr) {
-            RobotMsgItem item = new RobotMsgItem(msg);
-            if (msg.contains("适合您的岗位如下")) {
-                item.type = 1;
-            }
-            robotMsgList.add(item);
-        }
     }
 
     @Override
@@ -192,14 +207,6 @@ public class TalkActivity extends AppCompatActivity {
         }, 1000);
     }
 
-    private void startConversation() {
-        handler.postDelayed(() -> {
-            if (currentStep < personArr.length) {
-                simulateUserInput(currentStep);
-            }
-        }, 1000);
-    }
-
     private void simulateUserInput(int step) {
         setTalkingState(IDLE);
         handler.postDelayed(() -> {
@@ -212,7 +219,6 @@ public class TalkActivity extends AppCompatActivity {
             // 逐个字符显示
             new Thread(() -> {
                 String text = userMessage.getContent();
-                Log.e("potteraaa", text);
                 for (int i = 0; i < text.length(); i++) {
                     final int finalI = i;
                     handler.post(() -> {
@@ -391,22 +397,50 @@ public class TalkActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-//                    if(tag.equals("2")){
-//                        if (message.equals("stoprecord")) {
-//                            return;
-//                        }
-                    if (tag.equals("recordMsg")) {
-                        String menInput = message;
-                        stopRecord();
-                        setTalkingState(ROBOT_THINKING);
-//                        websocket.sendMsg(messge);
-
-                    } else if (tag.equals("ttsEnd")) {
-                        //机器人说完了
-                        setTalkingState(MEN_TALKING);
-                        startRecord();
+                    if (!tag.equals("1") && logText != null) {
+                        logText.append("tag = " + tag + "  message=" + message + "\n");
                     }
+                    //唤醒时说欢迎(人脸识别后迎宾)
+                    if (tag.equals("4")) {
+                        if (message.startsWith("wake up")) {
+                            startTTs(welComeStr);
+                        }
+                    }
+                    //语音播报结束-->开启录制新的一轮人的说话，语音识别
+                    if (tag.equals("3") && message.equals("ttsover")) {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                setTalkingState(MEN_TALKING);
+                                startRecord();
+                            }
+                        }, 50);
+//                        startRecord();
+                    }
+                    //语音识别过程，startRecord-->
+                    if (tag.equals("2")) {
+                        if (message.equals("stoprecord") || message.equals("startrecord")) {
+                            return;
+                        }
+                        setTalkingState(ROBOT_THINKING);
+                        String menInput = message;
+                        // 添加用户消息
+                        ChatMessage userMessage = ChatMessage.createUserMessage(menInput);
+                        adapter.messages.add(userMessage);
+                        int position = adapter.messages.size() - 1;
+                        adapter.notifyItemInserted(position);
+                        adapter.updateMessage(position, String.valueOf(userMessage.getContent()));
+                        ((LinearLayoutManager) recyclerView.getLayoutManager())
+                                .scrollToPosition(position);
+                        //websocket.sendMsg(menInput);
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                onReceiveWebsocketMsg("你好，我是机器人小枣");
+                            }
+                        },2000);
 
+                    }
                 }
             });
         }
@@ -416,11 +450,25 @@ public class TalkActivity extends AppCompatActivity {
     private void onReceiveWebsocketMsg(String str) {
         String robotResponse = str;
         setTalkingState(ROBOT_ANSWERING);
-        startTTs();
+        ChatMessage botMessage = ChatMessage.createBotTextMessage(robotResponse);
+        adapter.messages.add(botMessage);
+        int position = adapter.messages.size() - 1;
+        adapter.notifyItemInserted(position);
+        adapter.updateMessage(position, String.valueOf(robotResponse));
+        ((LinearLayoutManager) recyclerView.getLayoutManager())
+                .scrollToPosition(position);
+        startTTs(str);
     }
 
-    private void startTTs() {
+    private void startTTs(String str) {
 //        语音合成，机器人说话
 //        startTTs
+        if (iMyAidlInterface != null) {
+            try {
+                iMyAidlInterface.sendMessage("starttts", str);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
