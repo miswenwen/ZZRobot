@@ -45,23 +45,6 @@ public class TalkActivity extends AppCompatActivity {
     //    private Handler handler = new Handler();
     private String welComeStr = "欢迎使用枣庄人社局智能机器人";
     // 初始化对话数据
-    String[] personArr = {
-            "你好！",
-            "今天天气怎么样？",
-            "能推荐下岗位吗？",
-            "谢谢你的帮助",
-            "再见！",
-    };
-
-    String[] robotArr = {
-            "您好！很高兴为您服务",
-            "今天晴转多云，气温25-30℃",
-            "适合您的岗位如下",
-            "不客气，随时为您服务",
-            "再见！祝您有美好的一天",
-    };
-    List<RobotMsgItem> robotMsgList = new ArrayList<>();
-
     private ChatAdapter adapter;
     private int currentStep = 0;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -107,7 +90,6 @@ public class TalkActivity extends AppCompatActivity {
                          */
                         String direct = "0";
                         iMyAidlInterface.sendMessage("wakeup", direct);
-
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
@@ -150,7 +132,6 @@ public class TalkActivity extends AppCompatActivity {
         logText.setMovementMethod(ScrollingMovementMethod.getInstance());
         mTalkingStateText = (TextView) findViewById(R.id.talking_stata_text);
         mWaveAnim = (LottieAnimationView) findViewById(R.id.wave_anim);
-        robotMsgList = new ArrayList<>();
     }
 
     @Override
@@ -205,130 +186,6 @@ public class TalkActivity extends AppCompatActivity {
                 handler.postDelayed(this, 1000); // 每1秒更新一次
             }
         }, 1000);
-    }
-
-    private void simulateUserInput(int step) {
-        setTalkingState(IDLE);
-        handler.postDelayed(() -> {
-            // 添加用户消息
-            ChatMessage userMessage = ChatMessage.createUserMessage(personArr[step]);
-            adapter.messages.add(userMessage);
-            int position = adapter.messages.size() - 1;
-            adapter.notifyItemInserted(position);
-            setTalkingState(MEN_TALKING);
-            // 逐个字符显示
-            new Thread(() -> {
-                String text = userMessage.getContent();
-                for (int i = 0; i < text.length(); i++) {
-                    final int finalI = i;
-                    handler.post(() -> {
-                        adapter.updateMessage(position, String.valueOf(text.charAt(finalI)));
-                        ((LinearLayoutManager) recyclerView.getLayoutManager())
-                                .scrollToPosition(position);
-                    });
-                    try {
-                        Thread.sleep(150);
-                    } catch (InterruptedException e) {
-                    }
-                }
-                handler.post(() -> {
-                    userMessage.setCompleted(true);
-                    simulateBotResponse(step);
-                });
-            }).start();
-        }, 2000);
-
-    }
-
-    private void simulateBotResponse(int step) {
-        setTalkingState(ROBOT_THINKING);
-        handler.postDelayed(() -> {
-                    // 添加机器人消息
-                    ChatMessage botMessage;
-                    if (robotMsgList.get(step).type == 0) {
-                        botMessage = ChatMessage.createBotTextMessage(robotMsgList.get(step).content);
-                    } else if (robotMsgList.get(step).type == 1) {
-                        List<Job> jobs = new ArrayList<Job>() {{
-                            add(new Job(
-                                    "Java开发工程师",
-                                    "字节跳动",
-                                    "北京",
-                                    "25-40K·16薪",
-                                    true,
-                                    true,
-                                    true
-                            ));
-
-                            add(new Job(
-                                    "Android开发专家",
-                                    "腾讯科技",
-                                    "深圳",
-                                    "30-50K·14薪",
-                                    true,
-                                    false,
-                                    true
-                            ));
-
-                            add(new Job(
-                                    "大数据平台开发",
-                                    "阿里巴巴集团",
-                                    "杭州",
-                                    "20-35K·股票期权",
-                                    false,
-                                    true,
-                                    true
-                            ));
-
-                            add(new Job(
-                                    "移动端架构师",
-                                    "美团平台",
-                                    "上海",
-                                    "40-60K·技术分红"
-                            ));
-
-                            add(new Job(
-                                    "跨平台开发工程师",
-                                    "快手科技",
-                                    "广州",
-                                    "18-30K·弹性工作"
-                            ));
-                        }};
-                        botMessage = ChatMessage.createBotJobMessage(robotMsgList.get(step).content, jobs);
-                    } else {
-                        botMessage = ChatMessage.createUserMessage(robotMsgList.get(step).content);
-                    }
-                    adapter.messages.add(botMessage);
-                    int position = adapter.messages.size() - 1;
-                    adapter.notifyItemInserted(position);
-                    setTalkingState(ROBOT_ANSWERING);
-                    // 逐个字符显示
-                    new Thread(() -> {
-                        String text = botMessage.getContent();
-                        for (int i = 0; i < text.length(); i++) {
-                            final int finalI = i;
-                            handler.post(() -> {
-                                adapter.updateMessage(position, String.valueOf(text.charAt(finalI)));
-                                ((LinearLayoutManager) recyclerView.getLayoutManager())
-                                        .scrollToPosition(position);
-                            });
-                            try {
-                                Thread.sleep(150);
-                            } catch (InterruptedException e) {
-                            }
-                        }
-                        handler.post(() -> {
-                            botMessage.setCompleted(true);
-                            currentStep++;
-                            if (currentStep < personArr.length) {
-                                handler.postDelayed(() -> simulateUserInput(currentStep), 1000);
-                            } else {
-                                setTalkingState(IDLE);
-                            }
-                        });
-                    }).start();
-                }, 1000
-        );
-
     }
 
     private void bindService() {
@@ -417,7 +274,9 @@ public class TalkActivity extends AppCompatActivity {
                         }, 50);
 //                        startRecord();
                     }
-                    //语音识别过程，startRecord-->
+                    //语音识别过程，startRecord,callback第一次(tag:2,message:"startrecord")-->
+                    // 人说话-->callback第二次(tag:2,message:msg)-->
+                    // 底层自己stoprecord-->callback第三次((tag:2,message:"stoprecord")
                     if (tag.equals("2")) {
                         if (message.equals("stoprecord") || message.equals("startrecord")) {
                             return;
